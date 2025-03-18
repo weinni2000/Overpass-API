@@ -5,24 +5,45 @@ version: '3.8'
 services:
   overpass:
     # specify the image here
-    image: wiktorn/overpass-api:0.7.56.9
+    #image: wiktorn/overpass-api:0.7.56.9
+    #image: wiktorn/overpass-api:latest
+    image: wiktorn/overpass-api:0.7.62
+
     container_name: overpass
     # uncomment if you want to build the image yourself
     # build: .
     ports:
       - 12345:80
     volumes:
+      - type: bind
+        source: ./overpass_db
+        target: /db
+      - type: bind
+        source: ./osm-data
+        target: /osm-data
       # use a docker managed volume
-      - overpass-db:/db
+      #- overpass-db:/db
+      #- ./overpass_db:/db
+      #- /Volumes/USBSSD/_scripts/doodba/odoo/custom/src/Overpass-API/overpass_db:/db
+    #command: ["/bin/bash"]
+    #entrypoint: ["/bin/sh", "-c", "exec tail -f /dev/null"]
     environment:
+      - OVERPASS_PLANET_PREPROCESS=chmod og+rx /db
+      #- OVERPASS_PLANET_URL=file:///osm-data/austria-latest.osm.bz2
+      - OVERPASS_PLANET_URL=file:///osm-data/monaco-latest.osm.bz2
       - OVERPASS_META=no
+      - OVERPASS_STOP_AFTER_INIT=true
+      - OVERPASS_ALLOW_DUPLICATE_QUERIES=yes
       - OVERPASS_MODE=init
       #- OVERPASS_PLANET_URL=http://download.geofabrik.de/europe/monaco-latest.osm.bz2
-      - OVERPASS_PLANET_URL=https://download.geofabrik.de/europe/austria-latest.osm.bz2
+      #- OVERPASS_PLANET_URL=https://download.geofabrik.de/europe/austria-latest.osm.bz2
+      #- OVERPASS_PLANET_URL=/Volumes/USBSSD/Downloads/austria-latest.osm.bz2
       #- OVERPASS_DIFF_URL=http://download.openstreetmap.fr/replication/europe/monaco/minute/
-      - OVERPASS_DIFF_URL=https://download.geofabrik.de/europe/austria-updates
+      #- OVERPASS_DIFF_URL=https://download.geofabrik.de/europe/austria-updates
       - OVERPASS_UPDATE_SLEEP=3600
       - OVERPASS_USE_AREAS=false
-    healthcheck:
-      test: ["CMD-SHELL", "curl --noproxy '*' -qf 'http://localhost/api/interpreter?data=\[out:json\];node(1);out;' | jq '.generator' |grep -q Overpass || exit 1"]
-      start_period: 48h
+    #healthcheck:
+      #test: ["CMD-SHELL", "curl --noproxy '*' -qf 'http://localhost/api/interpreter?data=\[out:json\];node(1);out;' | jq '.generator' |grep -q Overpass || exit 1"]
+      #test: ["CMD-SHELL", "curl --noproxy '*' -qf 'http://localhost/api/interpreter?data=[out:json];node(1);out;' | jq '.generator' | grep -q Overpass || exit 1"]
+
+      #start_period: 48h
