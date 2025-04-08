@@ -4,10 +4,13 @@ volumes:
 version: '3.8'
 services:
   overpass:
+    #mem_limit: 1G  # Increase memory limit
+    #memswap_limit: 32G  # Allow more swap
+
     # specify the image here
     #image: wiktorn/overpass-api:0.7.56.9
     #image: wiktorn/overpass-api:latest
-    image: wiktorn/overpass-api:0.7.62
+    image: wiktorn/overpass-api:0.7.62.3 # only this version works
 
     container_name: overpass
     # uncomment if you want to build the image yourself
@@ -28,9 +31,9 @@ services:
     #command: ["/bin/bash"]
     #entrypoint: ["/bin/sh", "-c", "exec tail -f /dev/null"]
     environment:
-      - OVERPASS_PLANET_PREPROCESS=chmod og+rx /db
-      #- OVERPASS_PLANET_URL=file:///osm-data/austria-latest.osm.bz2
-      - OVERPASS_PLANET_URL=file:///osm-data/monaco-latest.osm.bz2
+      #- OVERPASS_PLANET_PREPROCESS=chmod og+rx /db
+      - OVERPASS_PLANET_URL=file:///osm-data/austria-latest.osm.bz2
+      #- OVERPASS_PLANET_URL=file:///osm-data/monaco-latest.osm.bz2
       - OVERPASS_META=no
       - OVERPASS_STOP_AFTER_INIT=true
       - OVERPASS_ALLOW_DUPLICATE_QUERIES=yes
@@ -42,8 +45,16 @@ services:
       #- OVERPASS_DIFF_URL=https://download.geofabrik.de/europe/austria-updates
       - OVERPASS_UPDATE_SLEEP=3600
       - OVERPASS_USE_AREAS=false
-    #healthcheck:
+      #healthcheck:
       #test: ["CMD-SHELL", "curl --noproxy '*' -qf 'http://localhost/api/interpreter?data=\[out:json\];node(1);out;' | jq '.generator' |grep -q Overpass || exit 1"]
       #test: ["CMD-SHELL", "curl --noproxy '*' -qf 'http://localhost/api/interpreter?data=[out:json];node(1);out;' | jq '.generator' | grep -q Overpass || exit 1"]
 
       #start_period: 48h
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    memswap_limit: 6G
+

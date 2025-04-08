@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# MOD
+#chmod og+rx /db
+
 set -eo pipefail
 shopt -s nullglob
 OVERPASS_META=${OVERPASS_META:-no}
